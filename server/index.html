@@ -452,6 +452,37 @@
   .cs-info .cs-state.cs-nomarket { color: var(--brand-coral); background: rgba(249, 115, 22, 0.12); }
   svg { width: 100%; height: auto; display: block; }
   .axis { fill: var(--muted); font: 10px var(--mono); }
+
+  /* A chart's caption -------------------------------------------------------
+     The text under a chart is not a footnote. For a reader who cannot see the
+     drawing it is the entire description, so it carries body-text weight and
+     the ink colour, and it takes both from the theme variables rather than
+     from literals — which is what lets it survive the dark scheme without a
+     second set of rules. It is left to wrap: at 320px a caption that scrolled
+     sideways with the chart would hide the very text that replaces it. */
+  figure.chart { margin: 0; }
+  figcaption {
+    margin-top: .75rem; padding-left: .7rem;
+    border-left: 3px solid var(--border);
+    font-size: .87rem; color: var(--ink);
+  }
+  a.to-table {
+    display: inline-block; margin-top: .6rem;
+    font-size: .86rem; color: var(--accent); text-decoration: underline;
+    text-underline-offset: .15em;
+  }
+  /* The table names itself. A screen reader reaching it unprompted gets the
+     same sentence a sighted reader gets from the column headings. */
+  caption {
+    caption-side: top; text-align: left; padding-bottom: .45rem;
+    color: var(--muted); font-size: .78rem; font-weight: 550;
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  /* Without a visible focus ring the link below the chart is reachable but
+     cannot be seen, which makes the association depend on the keyboard user
+     already knowing it is there. */
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .trend-legend { display: flex; gap: 1.1rem; margin-top: .4rem;
   .trend-legend { display: flex; gap: var(--space-4); margin-top: var(--space-2);
                   font: 550 .72rem/1 var(--mono); letter-spacing: .05em; color: var(--muted); }
   .trend-legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: var(--radius-xs);
@@ -1054,6 +1085,7 @@ function render(d) {
     parts.push(`<div class="panel"><h2>Loss against mid, by size</h2><p class="meta">Measured ${esc(ladderNote)}.</p>${curve(priced)}</div>`);
   }
 
+  parts.push(`<div class="panel"><h2 id="measurements">Measurements</h2><div class="scroll">${table(d.rungs, d.scored)}</div></div>`);
   parts.push(`<section class="panel" aria-label="Ladder measurements"><h2>Measurements</h2><div class="scroll">${table(d.rungs, d.scored, d.depends_on || [])}</div></section>`);
 
   if (d.scored) parts.push(legend());
@@ -1202,6 +1234,12 @@ function recommendationBlock(d) {
 
 // A log-x line chart. Loss is clamped to 0–100 so the shape of the curve, not
 // an outlier, sets the scale.
+//
+// The chart is not left as a picture of numbers. It carries a text
+// alternative built from these same rungs and named by the SVG, plus a link to
+// the table that holds them in full, so the association between the drawing
+// and its numbers is announced and followable rather than merely true of the
+// markup.
 function curve(rungs) {
   const W = 640, H = 220, P = 34;
   const xs = rungs.map(r => Math.log10(parseFloat(r.send_amount)));
@@ -1230,6 +1268,104 @@ function curve(rungs) {
       ? `<text class="axis" x="${sx(xs[i]).toFixed(1)}" y="${H - P + 14}"
            text-anchor="middle">${esc(r.send_amount)}</text>` : '').join('');
 
+  return `<figure class="chart">
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="loss-curve-alt">
+      ${grid}${thresh}
+      <polyline points="${pts.join(' ')}" fill="none" stroke="var(--bad)" stroke-width="2"/>
+      ${dots}${labels}
+      <text class="axis" x="${W / 2}" y="${H - 4}" text-anchor="middle">send amount (log scale)</text>
+    </svg>
+    <figcaption id="loss-curve-alt">${curveAlt(rungs)}</figcaption>
+  </figure>
+  <a class="to-table" href="#measurements">Read these same sizes in the Measurements table</a>`;
+}
+
+// The text alternative for the loss curve, and the whole of its description
+// for a reader who cannot see the shape.
+//
+// Every figure below is read off a rung the engine priced and published. The
+// shape itself is deliberately not characterised: comparing the first and last
+// point says where the curve ends up, not what it did in between, so a
+// sentence claiming a trend would be a claim these measurements do not carry.
+// What is given instead is the range the curve spans, where the unusable
+// threshold falls against that range, the sizes that could not be graded, and
+// the structural state the loss was measured under.
+function curveAlt(rungs) {
+  // A rung can be priced and still ungraded: the quote is real but the engine
+  // had no reference mid to score it against, so its verdict is UNKNOWN and
+  // its loss is the zero value, not a measurement. Those rungs are drawn on
+  // the chart, so they are accounted for here — but as ungraded, never as a
+  // loss of 0% and never as a failure.
+  const graded = rungs.filter(r => r.quote && r.quote.verdict !== 'UNKNOWN');
+  const ungraded = rungs.length - graded.length;
+  const unusable = graded.filter(r => r.quote.verdict === 'UNUSABLE').length;
+
+  const at = (r) => `${formatPct(r.quote.loss_pct)}% at send ${r.send_amount}`;
+  const byLoss = graded.slice().sort((a, b) =>
+    parseFloat(a.quote.loss_pct) - parseFloat(b.quote.loss_pct));
+
+  let body;
+  if (!graded.length) {
+    body = `None of the ${rungs.length} plotted ${rungs.length === 1 ? 'size' : 'sizes'}
+      could be graded against the reference mid, so the chart plots a price
+      without a loss to grade it.`;
+  } else if (graded.length === 1) {
+    body = `One size was priced and graded: ${at(byLoss[0])}.`;
+  } else {
+    body = `Loss spans ${at(byLoss[0])} to ${at(byLoss[byLoss.length - 1])}.`;
+  }
+
+  // A single plotted size is a point, not a span, so "all 1 of the 1" is
+  // arithmetic dressed as prose. Say it plainly instead.
+  let threshold = '';
+  if (graded.length === 1) {
+    threshold = unusable
+      ? 'It is UNUSABLE, above the 20% threshold against mid.'
+      : 'It is below the 20% unusable threshold.';
+  } else if (graded.length) {
+    threshold = unusable
+      ? `${unusable} of the ${graded.length} plotted sizes ${unusable === 1 ? 'is' : 'are'}
+         UNUSABLE, above the 20% threshold against mid.`
+      : `All ${graded.length} plotted sizes are below the 20% unusable threshold.`;
+  }
+
+  // Suppressed when nothing was graded: the opening sentence has already said
+  // so, and saying it twice would read as two separate facts.
+  const ungradedNote = ungraded && graded.length
+    ? ` ${ungraded} plotted ${ungraded === 1 ? 'size' : 'sizes'} could not be graded and
+       ${ungraded === 1 ? 'is' : 'are'} not counted above; ungraded is not a failure.`
+    : '';
+
+  // The rungs are the only source, and every figure above came off one of
+  // them, so there is nothing in this caption the engine did not publish.
+  return `${body} ${threshold}${ungradedNote} ${curveStructure(rungs)}`
+    .replace(/\s+/g, ' ').trim();
+}
+
+// The structural state the plotted rungs were measured under. DIRECT,
+// DERIVATIVE and NO-MARKET are facts about a corridor's shape, not grades of
+// it, and the chart draws all of them the same way — so the one fact a reader
+// cannot see in the drawing is the one the caption has to name.
+const STRUCTURE_OF_ROUTE = {
+  'DIRECT': 'The plotted route is DIRECT: a market exists between the two assets.',
+  'DERIVATIVE': 'The plotted route is DERIVATIVE: every path routes through an ' +
+    'intermediate asset, so the loss is measured through a dependency.',
+  'NO-MARKET': 'The plotted route is NO-MARKET.',
+};
+
+function curveStructure(rungs) {
+  const states = [...new Set(rungs.map(r => r.integrity))];
+  if (states.length > 1) {
+    // The sizes of one corridor normally share a state. If they do not, say
+    // so rather than naming one of them and implying the rest agree.
+    return `The plotted sizes were measured under more than one structural state: ${states.map(esc).join(', ')}.`;
+  }
+  // The lookup is guarded rather than trusted: a key that is not one of the
+  // three would otherwise fall through to Object.prototype and yield a
+  // function, which is the sort of thing that renders as nothing at all.
+  const known = STRUCTURE_OF_ROUTE[states[0]];
+  return typeof known === 'string' ? known
+    : 'The structural state of the plotted route was not established.';
   return `<svg viewBox="0 0 ${W} ${H}" role="img"
     aria-label="Loss against mid rising with trade size">
     ${grid}${thresh}
@@ -1286,6 +1422,7 @@ function table(rungs, scored, depends) {
 
   if (scored) {
     return `<table>
+      <caption>Every size measured, and the loss and verdict the curve plots</caption>
       <thead><tr>
         <th scope="col">Send</th><th scope="col">Receive</th><th scope="col">Rate</th><th scope="col">Loss</th><th scope="col">Verdict</th><th scope="col">Path</th>
       </tr></thead>
@@ -1293,6 +1430,8 @@ function table(rungs, scored, depends) {
     </table>`;
   }
   return `<table>
+    <caption>Every size measured. No loss or verdict: the reference providers
+      disagreed, so none was derived</caption>
     <thead><tr>
       <th scope="col">Send</th><th scope="col">Receive</th><th scope="col">Rate</th><th scope="col">Path</th>
     </tr></thead>
