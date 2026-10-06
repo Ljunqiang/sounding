@@ -385,6 +385,27 @@
   .balance-asset {
     font-size: var(--text-sm); color: var(--muted);
   }
+  /* Soroban Verification Badge */
+  .verified-badge {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--brand-deep-blue) 100%);
+    color: #FFFFFF;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs); font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em;
+    box-shadow: 0 2px 8px rgba(0, 209, 255, 0.3);
+  }
+  .verified-badge::before {
+    content: "✓";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px; height: 16px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    font-weight: 900;
+  }
   /* Panel entrance: a 240ms fade-and-settle that reads as the result having
      arrived, not as decoration. Under reduced motion the global override
      turns it into an instantaneous appear. */
@@ -1138,14 +1159,26 @@ function render(d) {
     : `The reading below was recorded ${d.stale?.age_human || 'in the past'} at ${d.stale?.recorded_at || d.measured_at}; it is not a live market measurement. Wayfare is non-custodial and read-only: it never holds funds, issues tokens, or moves money.`;
 
   // Headline: integrity state and the finding, before any numbers.
+  const corridorID = `${d.send_asset?.code || 'USDC'}→${d.receive_asset?.code || ''}`;
+
   parts.push(`${provenance}<section class="panel" aria-label="Corridor integrity and verdict">
     ${integrityElement(d.integrity, d.depends_on || [])}
     <p class="finding">${esc(d.finding)}</p>
     ${d.scored ? recommendationBlock(d) : unscoredBlock(d)}
     <p class="meta">Reference ${esc(d.reference_pair)} mid
       <strong>${esc(d.reference_mid)}</strong> via ${esc(d.reference_source)} ·
-      measured ${esc(d.measured_at)}</p>
+      measured ${esc(d.measured_at)}
+      <span id="soroban-badge-placeholder"></span>
+    </p>
   </section>`);
+
+  // Asynchronously check for Soroban attestations and add badge
+  getSorobanVerificationBadge(corridorID).then(badge => {
+    const placeholder = document.getElementById('soroban-badge-placeholder');
+    if (placeholder && badge) {
+      placeholder.innerHTML = ' · ' + badge;
+    }
+  });
 
   // Add personalized recommendation if wallet is connected
   const personalizedPanel = generatePersonalizedPanel(d);
@@ -2344,6 +2377,26 @@ function generateStellarXUrl(sendAsset, receiveAsset, amount) {
 function generateStellarTermUrl(sendAsset, receiveAsset) {
   // StellarTerm format: https://stellarterm.com/exchange/[SEND]-native/[RECEIVE]-native
   return `https://stellarterm.com/exchange/${sendAsset}-native/${receiveAsset}-native`;
+}
+
+// Check if corridor has Soroban attestations and return badge HTML
+async function getSorobanVerificationBadge(corridorID) {
+  try {
+    const response = await fetch(`/api/attestations/${encodeURIComponent(corridorID)}/latest`);
+    if (response.ok) {
+      const attestation = await response.json();
+      const explorerUrl = `https://stellar.expert/explorer/testnet/contract/${attestation.contract_id}`;
+      return `<a href="${esc(explorerUrl)}" target="_blank" rel="noopener noreferrer"
+                 class="verified-badge"
+                 title="This corridor has ${attestation.count || 1} on-chain attestation(s) verified on Stellar via Soroban">
+                Verified on Stellar
+              </a>`;
+    }
+  } catch (e) {
+    // Attestations not yet available - contract deployment pending
+    console.log('Soroban attestations not yet available');
+  }
+  return '';
 }
 
 // Attach event listeners
