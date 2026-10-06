@@ -3,7 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wayfare — corridor integrity monitor</title>
+<title>Stellar Pathfinder — Corridor Integrity Monitor for Stellar</title>
+<meta name="description" content="Monitor stablecoin→fiat-token corridor integrity on Stellar. Get transparent pricing across trade sizes, scored against independent reference rates.">
+<meta name="keywords" content="Stellar, stablecoin, corridor monitoring, DEX, remittance, blockchain, fintech">
+<meta property="og:title" content="Stellar Pathfinder — Corridor Integrity Monitor">
+<meta property="og:description" content="Transparent corridor monitoring for Stellar. Price stablecoin→fiat-token routes and see when they're actually worth taking.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Stellar Pathfinder — Corridor Integrity Monitor">
+<meta name="twitter:description" content="Monitor corridor integrity on Stellar with transparent, reference-based pricing.">
+<meta name="theme-color" content="#00D1FF">
 <style>
   /*
    * Design tokens (issue #281). Three layers, no build step.
@@ -27,28 +36,30 @@
    * which is how a structural state would start reading as a severity.
    */
   :root {
-    --brand-navy: #0F172A;
-    --brand-teal: #10B981;
+    /* Stellar Pathfinder Brand Colors - Modern Fintech Palette */
+    --brand-navy: #0A2540;
+    --brand-stellar-cyan: #00D1FF;
+    --brand-deep-blue: #1E40AF;
     --brand-amber: #F59E0B;
-    --brand-slate: #334155;
-    --brand-cloud: #F8FAFC;
+    --brand-slate: #475569;
+    --brand-cloud: #FAFBFC;
     --brand-coral: #F97316;
-    --critical: #B91C1C;
+    --critical: #DC2626;
     --critical-soft: #FEE2E2;
-    --success: #0F766E;
-    --success-soft: #D1FAE5;
-    --warning: #A16207;
+    --success: #00C896;
+    --success-soft: #ECFDF5;
+    --warning: #F59E0B;
     --warning-soft: #FEF3C7;
-    --neutral: #475569;
-    --neutral-soft: #E2E8F0;
-    --inset: #E2E8F0;
+    --neutral: #64748B;
+    --neutral-soft: #F1F5F9;
+    --inset: #F1F5F9;
     --bg: var(--brand-cloud);
     --panel: #FFFFFF;
     --panel-alt: #F8FAFC;
-    --border: #CBD5E1;
+    --border: #E2E8F0;
     --ink: var(--brand-navy);
     --muted: var(--neutral);
-    --accent: var(--brand-teal);
+    --accent: var(--brand-stellar-cyan);
     --bad: var(--critical);
     --warn: var(--warning);
     --ok: var(--success);
@@ -71,16 +82,16 @@
     --chart-direct: var(--brand-navy);
     --chart-derivative: var(--brand-slate);
     --chart-nomarket: var(--brand-coral);
-    --focus-ring: rgba(15, 118, 110, 0.28);
+    --focus-ring: rgba(0, 209, 255, 0.28);
     /* The halo above gives the indicator area; this is the edge that carries
        it. A focus indicator has to reach 3:1 against the surfaces it sits on
-       (SC 1.4.11 / 2.4.11), and a 28% teal wash over a white panel is nowhere
+       (SC 1.4.11 / 2.4.11), and a 28% cyan wash over a white panel is nowhere
        near that, so the ring is drawn twice: a solid outline that clears the
        contrast and the halo that makes it easy to find. Dark takes the light
        end of the same ramp for the same reason — the token flips with the
        scheme, the rule that uses it does not. */
-    --focus-outline: #0F766E;
-    --press-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.18);
+    --focus-outline: #0891B2;
+    --press-shadow: inset 0 1px 2px rgba(10, 37, 64, 0.18);
     --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --text-xs: .72rem;
     --text-sm: .82rem;
@@ -107,9 +118,11 @@
        surfaces. A circle (50%) is a shape, not a step, so it stays literal. */
     --radius-xs: 4px;
     --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.05), 0 8px 24px rgba(15, 23, 42, 0.04);
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-soft: 0 1px 3px rgba(10, 37, 64, 0.08), 0 4px 12px rgba(10, 37, 64, 0.05);
+    --shadow-medium: 0 2px 8px rgba(10, 37, 64, 0.1), 0 8px 24px rgba(10, 37, 64, 0.06);
+    --shadow-strong: 0 4px 16px rgba(10, 37, 64, 0.12), 0 12px 40px rgba(10, 37, 64, 0.08);
   }
   /*
    * Dark is a primitives-only swap. Nothing here names a role: the semantic and
@@ -118,16 +131,16 @@
    */
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #020817;
-      --panel: #0F172A;
-      --panel-alt: #111827;
-      --border: #334155;
-      --ink: #F8FAFC;
-      --muted: #CBD5E1;
-      --accent: var(--brand-teal);
-      --bad: #FCA5A5;
-      --warn: #FCD34D;
-      --ok: #6EE7B7;
+      --bg: #0A0F1E;
+      --panel: #151B2E;
+      --panel-alt: #1C2537;
+      --border: #2D3748;
+      --ink: #F9FAFB;
+      --muted: #D1D5DB;
+      --accent: var(--brand-stellar-cyan);
+      --bad: #F87171;
+      --warn: #FBBF24;
+      --ok: #34D399;
       --ok-soft: rgba(16, 185, 129, 0.18);
       --bad-soft: rgba(185, 28, 28, 0.18);
       --unknown: #CBD5E1;
@@ -145,8 +158,8 @@
       --warning-soft: rgba(245, 158, 11, 0.18);
       --success-soft: rgba(16, 185, 129, 0.18);
       --neutral-soft: rgba(148, 163, 184, 0.18);
-      --focus-ring: rgba(110, 231, 183, 0.35);
-      --focus-outline: #5EEAD4;
+      --focus-ring: rgba(0, 209, 255, 0.4);
+      --focus-outline: #06B6D4;
       --press-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
     }
 
@@ -154,34 +167,35 @@
      the OS says. Token set mirrors the prefers-color-scheme block above;
      keep the two in sync. */
   :root[data-theme="dark"] {
-      --bg: #020817;
-      --panel: #0F172A;
-      --panel-alt: #111827;
-      --border: #334155;
-      --ink: #F8FAFC;
-      --muted: #CBD5E1;
-      --accent: var(--brand-teal);
-      --bad: #FCA5A5;
-      --warn: #FCD34D;
-      --ok: #6EE7B7;
-      --ok-soft: rgba(16, 185, 129, 0.18);
-      --bad-soft: rgba(185, 28, 28, 0.18);
-      --unknown: #CBD5E1;
-      --unknown-soft: rgba(148, 163, 184, 0.18);
+      --bg: #0A0F1E;
+      --panel: #151B2E;
+      --panel-alt: #1C2537;
+      --border: #2D3748;
+      --ink: #F9FAFB;
+      --muted: #D1D5DB;
+      --accent: var(--brand-stellar-cyan);
+      --bad: #F87171;
+      --warn: #FBBF24;
+      --ok: #34D399;
+      --ok-soft: rgba(52, 211, 153, 0.18);
+      --bad-soft: rgba(248, 113, 113, 0.18);
+      --unknown: #D1D5DB;
+      --unknown-soft: rgba(209, 213, 219, 0.18);
       --grid: #1E293B;
-      --chart-grid: #334155;
-      --chart-line: #E2E8F0;
-      --chart-point: #F8FAFC;
-      --chart-threshold: #FCA5A5;
-      --chart-direct: #F8FAFC;
-      --chart-derivative: #CBD5E1;
+      --chart-grid: #2D3748;
+      --chart-line: #E5E7EB;
+      --chart-point: #F9FAFB;
+      --chart-threshold: #F87171;
+      --chart-direct: #F9FAFB;
+      --chart-derivative: #D1D5DB;
       --chart-nomarket: #FDBA74;
       --inset: #1E293B;
-      --critical-soft: rgba(185, 28, 28, 0.18);
-      --warning-soft: rgba(245, 158, 11, 0.18);
-      --success-soft: rgba(16, 185, 129, 0.18);
-      --neutral-soft: rgba(148, 163, 184, 0.18);
-      --focus-ring: rgba(110, 231, 183, 0.35);
+      --critical-soft: rgba(248, 113, 113, 0.18);
+      --warning-soft: rgba(251, 191, 36, 0.18);
+      --success-soft: rgba(52, 211, 153, 0.18);
+      --neutral-soft: rgba(209, 213, 219, 0.18);
+      --focus-ring: rgba(0, 209, 255, 0.4);
+      --focus-outline: #06B6D4;
       --press-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
     }
 
@@ -323,6 +337,53 @@
   .panel {
     background: var(--panel); border: 1px solid var(--border);
     border-radius: var(--radius-md); padding: var(--space-5) var(--space-5); margin-bottom: var(--space-5);
+  }
+  /* Wallet Connection Styles */
+  .wallet-section {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-4) 0; margin-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border);
+  }
+  .wallet-info {
+    display: flex; align-items: center; gap: var(--space-3);
+  }
+  .wallet-connected {
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--success-soft);
+    border: 1px solid var(--success);
+    border-radius: var(--radius-sm);
+    color: var(--success);
+  }
+  .wallet-address {
+    font-family: var(--mono); font-size: var(--text-sm);
+    color: var(--ink);
+  }
+  .wallet-badge {
+    display: inline-flex; align-items: center; gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    background: var(--accent); color: #FFFFFF;
+    border-radius: var(--radius-xs);
+    font-size: var(--text-xs); font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em;
+  }
+  .wallet-balances {
+    display: flex; flex-wrap: wrap; gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+  .balance-item {
+    display: flex; align-items: baseline; gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    background: var(--panel-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .balance-amount {
+    font-family: var(--mono); font-weight: 700;
+    color: var(--ink);
+  }
+  .balance-asset {
+    font-size: var(--text-sm); color: var(--muted);
   }
   /* Panel entrance: a 240ms fade-and-settle that reads as the result having
      arrived, not as decoration. Under reduced motion the global override
@@ -557,7 +618,7 @@
   // never flashes the wrong scheme. "system" (or nothing stored) leaves the
   // data-theme attribute off and the prefers-color-scheme query governs.
   try {
-    var t = localStorage.getItem('wayfare-theme');
+    var t = localStorage.getItem('stellar-pathfinder-theme');
     if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
   } catch (e) {}
 </script>
@@ -566,11 +627,24 @@
 <a class="skip-link" href="#out">Skip to the results</a>
 <div class="wrap">
   <header>
-    <h1>Wayfare</h1>
-    <p class="sub">Corridor integrity monitor. Prices a stablecoin&nbsp;&rarr;&nbsp;fiat-token
-    corridor across trade sizes, scores every route against an independent reference
-    rate, and states plainly when none are worth taking.</p>
+    <h1>Stellar Pathfinder</h1>
+    <p class="sub">Corridor integrity monitor for Stellar. Prices stablecoin&nbsp;&rarr;&nbsp;fiat-token
+    corridors across trade sizes, scores every route against independent reference
+    rates, and states plainly when none are worth taking.</p>
   </header>
+
+  <!-- Wallet Connection Section -->
+  <div class="wallet-section" id="wallet-section">
+    <div class="wallet-info">
+      <button id="connect-wallet" type="button">Connect Wallet</button>
+      <div id="wallet-connected" class="wallet-connected" style="display: none;">
+        <span class="wallet-badge" id="wallet-type">Freighter</span>
+        <span class="wallet-address" id="wallet-address"></span>
+        <button id="disconnect-wallet" type="button">Disconnect</button>
+      </div>
+    </div>
+    <div id="wallet-balances" class="wallet-balances" style="display: none;"></div>
+  </div>
 
   <a class="skip-link" href="#out">Skip to results</a>
   <div class="controls">
@@ -617,8 +691,8 @@
         <span></span><span></span><span></span>
       </div>
       <p class="loading-what">
-        Wayfare prices a stablecoin&nbsp;&rarr;&nbsp;fiat-token corridor against
-        an independent reference rate, scores every route against that benchmark,
+        Stellar Pathfinder prices stablecoin&nbsp;&rarr;&nbsp;fiat-token corridors on the Stellar network
+        against independent reference rates, scores every route against that benchmark,
         and states plainly when no route is worth taking.
       </p>
       <p class="loading-wake">
@@ -631,8 +705,8 @@
   </main>
 
   <footer>
-    <span id="footer-provenance">Wayfare is non-custodial and read-only: it never holds funds,
-    issues tokens, or moves money.</span>
+    <span id="footer-provenance">Stellar Pathfinder is non-custodial and read-only: it never holds funds,
+    issues tokens, or moves money. Powered by Stellar.</span>
   </footer>
 </div>
 
@@ -1072,6 +1146,10 @@ function render(d) {
       <strong>${esc(d.reference_mid)}</strong> via ${esc(d.reference_source)} ·
       measured ${esc(d.measured_at)}</p>
   </section>`);
+
+  // Add personalized recommendation if wallet is connected
+  const personalizedPanel = generatePersonalizedPanel(d);
+  if (personalizedPanel) parts.push(personalizedPanel);
 
   const priced = d.rungs.filter(r => r.priced);
   if (d.scored && priced.length) {
@@ -1999,6 +2077,282 @@ async function loadCorridor(to) {
     announce(`Could not load corridor data: ${e.message}. If the instance is still waking up, wait a moment and reload.`);
   }
 }
+
+// ============================================================================
+// WALLET INTEGRATION (Freighter & Albedo)
+// ============================================================================
+
+let connectedWallet = null; // { type: 'freighter'|'albedo', publicKey: string }
+let walletBalances = {};
+
+// Check if Freighter is installed
+function isFreighterInstalled() {
+  return window.freighterApi !== undefined;
+}
+
+// Connect to Freighter wallet
+async function connectFreighter() {
+  if (!isFreighterInstalled()) {
+    alert('Freighter wallet is not installed. Please install it from https://www.freighter.app/');
+    return null;
+  }
+
+  try {
+    const publicKey = await window.freighterApi.getPublicKey();
+    if (!publicKey) throw new Error('Failed to get public key from Freighter');
+    return { type: 'freighter', publicKey };
+  } catch (e) {
+    console.error('Freighter connection failed:', e);
+    alert(`Failed to connect to Freighter: ${e.message}`);
+    return null;
+  }
+}
+
+// Connect to Albedo wallet
+async function connectAlbedo() {
+  try {
+    // Load Albedo SDK dynamically
+    if (!window.albedo) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/@albedo-link/intent@0.11.1/lib/albedo.intent.js';
+      await new Promise((resolve, reject) => {
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    const result = await window.albedo.publicKey({});
+    if (!result || !result.pubkey) throw new Error('Failed to get public key from Albedo');
+    return { type: 'albedo', publicKey: result.pubkey };
+  } catch (e) {
+    console.error('Albedo connection failed:', e);
+    alert(`Failed to connect to Albedo: ${e.message}`);
+    return null;
+  }
+}
+
+// Show wallet selection dialog
+async function connectWallet() {
+  const choice = confirm('Connect with Freighter?\n\nOK = Freighter (browser extension)\nCancel = Albedo (web-based)');
+
+  const wallet = choice ? await connectFreighter() : await connectAlbedo();
+  if (!wallet) return;
+
+  connectedWallet = wallet;
+  updateWalletUI();
+  await fetchBalances();
+}
+
+// Disconnect wallet
+function disconnectWallet() {
+  connectedWallet = null;
+  walletBalances = {};
+  updateWalletUI();
+}
+
+// Update UI to show connected/disconnected state
+function updateWalletUI() {
+  const connectBtn = $('connect-wallet');
+  const connectedDiv = $('wallet-connected');
+  const walletType = $('wallet-type');
+  const walletAddr = $('wallet-address');
+  const balancesDiv = $('wallet-balances');
+
+  if (connectedWallet) {
+    connectBtn.style.display = 'none';
+    connectedDiv.style.display = 'flex';
+    walletType.textContent = connectedWallet.type === 'freighter' ? 'Freighter' : 'Albedo';
+    walletAddr.textContent = formatAddress(connectedWallet.publicKey);
+    walletAddr.title = connectedWallet.publicKey;
+  } else {
+    connectBtn.style.display = 'inline-flex';
+    connectedDiv.style.display = 'none';
+    balancesDiv.style.display = 'none';
+    balancesDiv.innerHTML = '';
+  }
+}
+
+// Format Stellar address for display (truncate middle)
+function formatAddress(addr) {
+  if (!addr || addr.length < 12) return addr;
+  return `${addr.substring(0, 4)}...${addr.substring(addr.length - 4)}`;
+}
+
+// Fetch balances from Horizon
+async function fetchBalances() {
+  if (!connectedWallet) return;
+
+  const horizonUrl = 'https://horizon.stellar.org';
+  try {
+    const response = await fetch(`${horizonUrl}/accounts/${connectedWallet.publicKey}`);
+    if (!response.ok) throw new Error(`Failed to fetch account: ${response.status}`);
+
+    const account = await response.json();
+    walletBalances = {};
+
+    for (const balance of account.balances) {
+      if (balance.asset_type === 'native') {
+        walletBalances['XLM'] = parseFloat(balance.balance);
+      } else {
+        const assetCode = balance.asset_code;
+        walletBalances[assetCode] = parseFloat(balance.balance);
+      }
+    }
+
+    displayBalances();
+  } catch (e) {
+    console.error('Failed to fetch balances:', e);
+    alert(`Failed to fetch balances: ${e.message}`);
+  }
+}
+
+// Display balances in UI
+function displayBalances() {
+  const balancesDiv = $('wallet-balances');
+  if (Object.keys(walletBalances).length === 0) {
+    balancesDiv.style.display = 'none';
+    return;
+  }
+
+  // Show only relevant assets (XLM, USDC, and corridor assets)
+  const relevantAssets = ['XLM', 'USDC', 'NGNC', 'GHSC', 'KESC', 'NGNT'];
+  const html = relevantAssets
+    .filter(asset => walletBalances[asset] && walletBalances[asset] > 0)
+    .map(asset => `
+      <div class="balance-item">
+        <span class="balance-amount">${formatBalance(walletBalances[asset])}</span>
+        <span class="balance-asset">${esc(asset)}</span>
+      </div>
+    `).join('');
+
+  if (html) {
+    balancesDiv.innerHTML = html;
+    balancesDiv.style.display = 'flex';
+  } else {
+    balancesDiv.style.display = 'none';
+  }
+}
+
+// Format balance for display
+function formatBalance(amount) {
+  if (amount >= 1000) return amount.toFixed(2);
+  if (amount >= 1) return amount.toFixed(4);
+  return amount.toFixed(7);
+}
+
+// Generate personalized recommendation panel based on wallet balances
+function generatePersonalizedPanel(corridorData) {
+  if (!connectedWallet || !corridorData || !corridorData.scored) return '';
+
+  const sendAsset = corridorData.send_asset?.code || 'USDC';
+  const receiveAsset = corridorData.receive_asset?.code || '';
+
+  // Check if user has the send asset
+  const userBalance = walletBalances[sendAsset] || 0;
+  if (userBalance === 0) {
+    return `<div class="panel">
+      <h2>💼 Your Wallet</h2>
+      <p>You don't have any ${esc(sendAsset)} in your connected wallet.</p>
+      <p class="meta">Connect your wallet above to see personalized swap simulations.</p>
+    </div>`;
+  }
+
+  // Find best route from user's available sizes
+  const priced = corridorData.rungs.filter(r => r.priced && parseFloat(r.send) <= userBalance);
+  if (priced.length === 0) {
+    return `<div class="panel">
+      <h2>💼 Your Wallet</h2>
+      <p>You have <strong>${formatBalance(userBalance)} ${esc(sendAsset)}</strong></p>
+      <p class="meta">This amount is below the minimum tested size for this corridor.</p>
+    </div>`;
+  }
+
+  // Find best verdict from available sizes
+  const goodRoutes = priced.filter(r => r.verdict === 'GOOD');
+  const fairRoutes = priced.filter(r => r.verdict === 'FAIR');
+  const bestRoute = goodRoutes.length > 0 ? goodRoutes[goodRoutes.length - 1] :
+                    fairRoutes.length > 0 ? fairRoutes[fairRoutes.length - 1] :
+                    priced[priced.length - 1];
+
+  const stellarXUrl = generateStellarXUrl(sendAsset, receiveAsset, bestRoute.send);
+  const stellarTermUrl = generateStellarTermUrl(sendAsset, receiveAsset);
+
+  return `<div class="panel" style="background: linear-gradient(135deg, var(--panel) 0%, var(--panel-alt) 100%); border: 2px solid var(--accent);">
+    <h2>💼 Your Personalized Recommendation</h2>
+    <div style="display: grid; gap: var(--space-4); margin-top: var(--space-4);">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="color: var(--muted);">Your Balance:</span>
+        <strong style="font-family: var(--mono); font-size: var(--text-lg);">${formatBalance(userBalance)} ${esc(sendAsset)}</strong>
+      </div>
+
+      <div style="padding: var(--space-4); background: var(--panel); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <h3 style="margin: 0 0 var(--space-3); font-size: var(--text-md);">Simulate Swap: ${esc(bestRoute.send)} ${esc(sendAsset)}</h3>
+        <div style="display: grid; gap: var(--space-2);">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--muted);">You'd receive:</span>
+            <strong style="font-family: var(--mono);">${esc(bestRoute.receive)} ${esc(receiveAsset)}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--muted);">Loss vs mid:</span>
+            <span class="${verdictClass(bestRoute.verdict)}" style="font-family: var(--mono); font-weight: 600;">${formatPct(bestRoute.loss_pct)}%</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--muted);">Verdict:</span>
+            <span class="${verdictClass(bestRoute.verdict)}">${verdictMark(bestRoute.verdict)} ${esc(bestRoute.verdict)}</span>
+          </div>
+        </div>
+      </div>
+
+      ${bestRoute.verdict === 'GOOD' || bestRoute.verdict === 'FAIR' ? `
+        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+          <a href="${esc(stellarXUrl)}" target="_blank" rel="noopener noreferrer"
+             style="flex: 1; min-width: 140px; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+                    padding: var(--space-3) var(--space-4); background: var(--accent); color: #FFFFFF;
+                    text-decoration: none; border-radius: var(--radius-sm); font-weight: 600;
+                    transition: opacity .2s ease;">
+            Execute on StellarX →
+          </a>
+          <a href="${esc(stellarTermUrl)}" target="_blank" rel="noopener noreferrer"
+             style="flex: 1; min-width: 140px; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+                    padding: var(--space-3) var(--space-4); background: var(--panel-alt); color: var(--ink);
+                    text-decoration: none; border-radius: var(--radius-sm); font-weight: 600; border: 1px solid var(--border);
+                    transition: background .2s ease;">
+            Execute on StellarTerm →
+          </a>
+        </div>
+        <p style="font-size: var(--text-sm); color: var(--muted); margin: 0;">
+          ⚠️ Stellar Pathfinder is non-custodial. Clicking these links opens external DEXs where you'll execute the swap using your wallet.
+        </p>
+      ` : `
+        <p style="padding: var(--space-3); background: var(--bad-soft); border: 1px solid var(--bad);
+                  border-radius: var(--radius-sm); color: var(--bad); margin: 0;">
+          ⚠️ This corridor is graded <strong>${esc(bestRoute.verdict)}</strong>. We don't recommend executing this swap.
+        </p>
+      `}
+    </div>
+  </div>`;
+}
+
+// Generate StellarX deep link
+function generateStellarXUrl(sendAsset, receiveAsset, amount) {
+  // StellarX format: https://www.stellarx.com/swap/[SEND]/[RECEIVE]
+  return `https://www.stellarx.com/swap/${sendAsset}:native/${receiveAsset}:native`;
+}
+
+// Generate StellarTerm deep link
+function generateStellarTermUrl(sendAsset, receiveAsset) {
+  // StellarTerm format: https://stellarterm.com/exchange/[SEND]-native/[RECEIVE]-native
+  return `https://stellarterm.com/exchange/${sendAsset}-native/${receiveAsset}-native`;
+}
+
+// Attach event listeners
+$('connect-wallet').addEventListener('click', connectWallet);
+$('disconnect-wallet').addEventListener('click', disconnectWallet);
+
+// ============================================================================
+// END WALLET INTEGRATION
+// ============================================================================
 
 // On page load, populate the corridor selector from /api/assets first, then
 // fetch the corridor it selected from recorded history (no &live=1) so the

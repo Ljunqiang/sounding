@@ -1,9 +1,9 @@
-# Wayfare
+# Stellar Pathfinder
 
-A corridor-integrity monitor for Stellar.
+**A corridor-integrity monitor for the Stellar network.**
 
-Wayfare prices a stablecoin → fiat-token corridor across trade sizes, scores
-every route against an independent mid-market rate, and states plainly when
+Stellar Pathfinder prices stablecoin → fiat-token corridors across trade sizes, scores
+every route against independent mid-market rates, and states plainly when
 none of them are worth taking — including when the honest answer is *don't
 send this*.
 
@@ -12,7 +12,7 @@ issued, no KYC, no keys.
 
 ---
 
-## Try Wayfare
+## Try Stellar Pathfinder
 
 | | |
 |:---|:---|
@@ -121,8 +121,29 @@ that could provide a less charitable benchmark was investigated — no usable
 source was found. See
 [docs/parallel-rate-research.md](docs/parallel-rate-research.md).
 
-The issuer set is case study #1, not the product. Wayfare measures any
-stablecoin → fiat-token corridor.
+The issuer set is case study #1, not the product. Stellar Pathfinder measures any
+stablecoin → fiat-token corridor on the Stellar network.
+
+---
+
+## Stellar Integration
+
+Stellar Pathfinder is **Stellar-native** and leverages the network's unique capabilities:
+
+**Horizon Pathfinding** — Uses Stellar's `strict-send` pathfinding API, which includes both on-chain order books *and* AMM pools. Traditional order book walks miss AMM liquidity; Horizon's pathfinding delegates to the same engine that executes payments.
+
+**SEP Standards Support** — Integrates with Stellar Ecosystem Proposals:
+- **SEP-1**: Asset discovery via `stellar.toml`
+- **SEP-10/24**: Anchor authentication and deposit/withdrawal endpoints
+- **SEP-38**: Anchor RFQ (Request for Quote) infrastructure
+
+**Asset Verification** — Assets are identified by issuer (not just code), following SEP-38 format:
+- `stellar:CODE:ISSUER` for Stellar assets
+- `iso4217:CODE` for fiat reference rates
+
+**Precision-Preserving** — Money crosses the wire as decimal strings (not JSON numbers) to preserve full precision for verdict calculation, preventing rounding errors in financial calculations.
+
+**Non-Custodial** — Never holds Stellar keys, never issues tokens, never touches user funds. Read-only monitoring only.
 
 ---
 
