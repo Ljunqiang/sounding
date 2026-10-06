@@ -1,0 +1,135 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1280" height="640" fill="url(#bannerBg)"/>
+
+  <!-- Grid pattern overlay -->
+  <g opacity="0.03" stroke="#00D1FF" stroke-width="1">
+    <path d="M 0,160 L 1280,160 M 0,320 L 1280,320 M 0,480 L 1280,480"/>
+    <path d="M 320,0 L 320,640 M 640,0 L 640,640 M 960,0 L 960,640"/>
+  </g>
+
+  <!-- Decorative paths in background -->
+  <g opacity="0.15" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="M 100,200 Q 300,150 500,200 T 900,200" stroke="#00D1FF" stroke-dasharray="12 8"/>
+    <path d="M 100,440 Q 300,490 500,440 T 900,440" stroke="#00D1FF" stroke-dasharray="12 8"/>
+    <path d="M 200,100 Q 200,200 300,300 T 500,500" stroke="#1E40AF" stroke-dasharray="8 12" opacity="0.5"/>
+  </g>
+
+  <!-- Main Logo Icon (left side) -->
+  <g transform="translate(200, 320)">
+    <!-- Main Star -->
+    <circle cx="0" cy="0" r="80" fill="url(#mainStar)" opacity="0.15"/>
+    <circle cx="0" cy="0" r="35" fill="url(#coreGrad)"/>
+    <circle cx="0" cy="0" r="25" fill="#00D1FF" opacity="0.95"/>
+    <circle cx="0" cy="0" r="14" fill="#FFFFFF"/>
+
+    <!-- Star rays -->
+    <g opacity="0.9">
+      <path d="M 0,-70 L 4,-28 L 0,-20 L -4,-28 Z" fill="url(#rayBanner)"/>
+      <path d="M 50,-50 L 24,-24 L 20,-20 L 16,-24 Z" fill="url(#rayBanner)"/>
+      <path d="M 70,0 L 28,4 L 20,0 L 28,-4 Z" fill="url(#rayBanner)"/>
+      <path d="M 50,50 L 24,24 L 20,20 L 24,16 Z" fill="url(#rayBanner)"/>
+      <path d="M 0,70 L -4,28 L 0,20 L 4,28 Z" fill="url(#rayBanner)"/>
+      <path d="M -50,50 L -24,24 L -20,20 L -24,16 Z" fill="url(#rayBanner)"/>
+      <path d="M -70,0 L -28,-4 L -20,0 L -28,4 Z" fill="url(#rayBanner)"/>
+      <path d="M -50,-50 L -24,-24 L -20,-20 L -16,-24 Z" fill="url(#rayBanner)"/>
+    </g>
+
+    <!-- Pathfinding Routes -->
+    <g opacity="0.8" stroke-width="5">
+      <path d="M -100,0 Q -70,-35 0,-10" stroke="url(#route1)" fill="none" stroke-dasharray="12 6"/>
+      <path d="M -100,0 L -40,0" stroke="url(#route2)" fill="none" stroke-width="7"/>
+      <path d="M -100,0 Q -70,35 0,10" stroke="url(#route3)" fill="none" stroke-dasharray="8 10" opacity="0.6"/>
+      <path d="M 40,0 L 100,0" stroke="url(#route2)" fill="none" stroke-width="6"/>
+    </g>
+
+    <!-- Nodes -->
+    <circle cx="-100" cy="0" r="10" fill="#0A2540"/>
+    <circle cx="-100" cy="0" r="5" fill="#00D1FF"/>
+    <circle cx="100" cy="0" r="10" fill="#0A2540"/>
+    <circle cx="100" cy="0" r="5" fill="#00D1FF"/>
+  </g>
+
+  <!-- Main Text -->
+  <g transform="translate(380, 260)">
+    <!-- "STELLAR PATHFINDER" -->
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="92" font-weight="800" fill="url(#titleGrad)" letter-spacing="-1.5">
+      STELLAR
+    </text>
+    <text x="0" y="90" font-family="Arial, sans-serif" font-size="92" font-weight="800" fill="url(#titleGrad2)" letter-spacing="-1.5">
+      PATHFINDER
+    </text>
+
+    <!-- Tagline -->
+    <text x="0" y="135" font-family="Arial, sans-serif" font-size="28" font-weight="400" fill="#FAFBFC" opacity="0.9" letter-spacing="0.5">
+      Corridor Integrity Monitor for the Stellar Network
+    </text>
+  </g>
+
+  <!-- Decorative elements - right side -->
+  <g transform="translate(1000, 320)">
+    <!-- Small stars -->
+    <circle cx="50" cy="-80" r="4" fill="#00D1FF" opacity="0.6"/>
+    <circle cx="120" cy="-40" r="3" fill="#00D1FF" opacity="0.5"/>
+    <circle cx="90" cy="60" r="5" fill="#00D1FF" opacity="0.7"/>
+
+    <!-- Network visualization -->
+    <g opacity="0.4" stroke="#00D1FF" stroke-width="2" fill="none">
+      <circle cx="80" cy="0" r="30"/>
+      <circle cx="150" cy="-60" r="20"/>
+      <circle cx="150" cy="60" r="20"/>
+      <line x1="100" y1="-20" x2="140" y2="-50"/>
+      <line x1="100" y1="20" x2="140" y2="50"/>
+    </g>
+  </g>
+
+  <!-- Gradients and Definitions -->
+  <defs>
+    <linearGradient id="bannerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A2540;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1E40AF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0A2540;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="mainStar" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00D1FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0A2540;stop-opacity:0" />
+    </radialGradient>
+
+    <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00D1FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </radialGradient>
+
+    <linearGradient id="rayBanner" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00D1FF;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0.3" />
+    </linearGradient>
+
+    <linearGradient id="route1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#00C896;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="route2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.5" />
+      <stop offset="100%" style="stop-color:#00D1FF;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="route3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:0.7" />
+    </linearGradient>
+
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00D1FF;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="titleGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00D1FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+</svg>
