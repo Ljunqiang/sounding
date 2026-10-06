@@ -16,9 +16,9 @@ issued, no KYC, no keys.
 
 | | |
 |:---|:---|
-| **Live** | **https://wayfare-cdb9.onrender.com/** |
-| **Source** | https://github.com/Wayfare-labs/wayfare |
-| **Health** | https://wayfare-cdb9.onrender.com/healthz |
+| **Live** | **https://stellar-pathfinder.onrender.com/** |
+| **Source** | https://github.com/Stellar-Pathfinder/stellar-pathfinder |
+| **Health** | https://stellar-pathfinder.onrender.com/healthz |
 
 That is a real deployed instance of the code in this repository — the same
 container image CI builds and verifies. Three things about it are worth knowing
