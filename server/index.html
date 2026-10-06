@@ -214,18 +214,81 @@
     font: 0.9375rem/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   .wrap { max-width: 900px; margin: 0 auto; padding: var(--space-10) var(--space-5) var(--space-20); }
-  header { border-bottom: 1px solid var(--border); padding-bottom: var(--space-5); margin-bottom: var(--space-7); }
-  h1 { font-size: var(--text-xl); margin: 0 0 var(--space-1); letter-spacing: -0.02em; }
-  .sub { color: var(--muted); font-size: var(--text-md); margin: 0; }
-  .controls { display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center; margin-bottom: var(--space-6); }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-6);
+    margin-bottom: var(--space-8);
+    background: linear-gradient(135deg, var(--panel) 0%, var(--panel-alt) 100%);
+    padding: var(--space-6) var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    margin-bottom: var(--space-6);
+  }
+  h1 {
+    font-size: 2rem;
+    margin: 0 0 var(--space-3);
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--ink) 0%, var(--brand-deep-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .sub {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin: 0;
+    line-height: 1.7;
+    max-width: 700px;
+  }
+  .controls {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: var(--space-6);
+    padding: var(--space-5);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+  .controls label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+  }
   select, button, input {
-    font: inherit; padding: var(--space-3) var(--space-3); border-radius: var(--radius-sm);
+    font: inherit; padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm);
     border: 1px solid var(--border); background: var(--panel); color: var(--ink);
     transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    font-size: 0.95rem;
   }
   input { width: 16rem; max-width: 100%; }
   @media (max-width: 640px) { input { width: 100%; } }
-  button { cursor: pointer; font-weight: 600; }
+  button {
+    cursor: pointer;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--brand-deep-blue) 100%);
+    color: #FFFFFF;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 209, 255, 0.2);
+  }
+  button:hover:not(:disabled) {
+    box-shadow: 0 4px 12px rgba(0, 209, 255, 0.3);
+    transform: translateY(-1px);
+  }
+  button#run {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--brand-deep-blue) 100%);
+  }
+  button#trend {
+    background: var(--panel-alt);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
 
   /* Interactive state contract (issue #285) -------------------------------
      Four states, defined once here and never redefined per component.
@@ -569,7 +632,15 @@
                   font: 550 .72rem/1 var(--mono); letter-spacing: .05em; color: var(--muted); }
   .trend-legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: var(--radius-xs);
                       margin-right: var(--space-1); vertical-align: -1px; }
-  footer { color: var(--muted); font-size: .82rem; border-top: 1px solid var(--border); padding-top: var(--space-4); margin-top: var(--space-8); }
+  footer {
+    color: var(--muted);
+    font-size: .9rem;
+    border-top: 1px solid var(--border);
+    padding-top: var(--space-6);
+    margin-top: var(--space-12);
+    text-align: center;
+    line-height: 1.6;
+  }
   code { font-family: var(--mono); font-size: .85em; }
 
   /* Results focus target ------------------------------------------------- */
@@ -578,15 +649,22 @@
 
   /* Loading / cold-start state ------------------------------------------- */
   .loading-panel {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: var(--radius-md); padding: var(--space-6) var(--space-5); margin-bottom: var(--space-5);
-    display: flex; flex-direction: column; gap: var(--space-4);
+    background: linear-gradient(135deg, var(--panel) 0%, var(--panel-alt) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-8) var(--space-6);
+    margin-bottom: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: center;
+    text-align: center;
   }
   .loading-dots {
-    display: flex; gap: var(--space-2); align-items: center;
+    display: flex; gap: var(--space-3); align-items: center;
   }
   .loading-dots span {
-    width: 8px; height: 8px; border-radius: 50%;
+    width: 10px; height: 10px; border-radius: 50%;
     background: var(--accent); opacity: .25;
     animation: pulse 1.4s ease-in-out infinite;
   }
@@ -597,11 +675,19 @@
     40%            { opacity: .85; }
   }
   .loading-what {
-    font-size: .97rem; color: var(--ink);
+    font-size: 1.1rem;
+    color: var(--ink);
+    font-weight: 500;
+    max-width: 600px;
   }
   .loading-wake {
-    font-size: .85rem; color: var(--muted);
-    border-left: 3px solid var(--border); padding-left: var(--space-3);
+    font-size: .95rem;
+    color: var(--muted);
+    padding: var(--space-4);
+    background: var(--panel);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    max-width: 600px;
   }
 
   /* Empty states (issue #300) --------------------------------------------
@@ -649,9 +735,7 @@
 <div class="wrap">
   <header>
     <h1>Stellar Pathfinder</h1>
-    <p class="sub">Corridor integrity monitor for Stellar. Prices stablecoin&nbsp;&rarr;&nbsp;fiat-token
-    corridors across trade sizes, scores every route against independent reference
-    rates, and states plainly when none are worth taking.</p>
+    <p class="sub">Real-time corridor monitoring for the Stellar network. Measure stablecoin-to-fiat routes with transparent pricing, independent verification, and honest recommendations.</p>
   </header>
 
   <!-- Wallet Connection Section -->
@@ -712,22 +796,20 @@
         <span></span><span></span><span></span>
       </div>
       <p class="loading-what">
-        Stellar Pathfinder prices stablecoin&nbsp;&rarr;&nbsp;fiat-token corridors on the Stellar network
-        against independent reference rates, scores every route against that benchmark,
-        and states plainly when no route is worth taking.
+        <strong>Welcome to Stellar Pathfinder</strong> — Real-time corridor integrity monitoring for Stellar.
       </p>
       <p class="loading-wake">
-        Select a corridor above and press <strong>Measure live</strong> to fetch a fresh
-        reading, or <strong>Show trend</strong> to inspect recorded history. The instance may
-        be waking up from sleep &mdash; Render free-tier pauses after 15&nbsp;minutes of
-        inactivity (this usually takes under a minute).
+        Select a corridor from the dropdown above and click <strong>Measure live</strong> for real-time pricing,
+        or <strong>Show trend</strong> to view historical data. First load may take a moment as the service initializes.
       </p>
     </div>
   </main>
 
   <footer>
-    <span id="footer-provenance">Stellar Pathfinder is non-custodial and read-only: it never holds funds,
-    issues tokens, or moves money. Powered by Stellar.</span>
+    <span id="footer-provenance">
+      <strong>Stellar Pathfinder</strong> is a non-custodial monitoring tool. We never hold funds, issue tokens, or execute transactions.
+      Built on Stellar with Horizon, Soroban, and SEP standards.
+    </span>
   </footer>
 </div>
 
