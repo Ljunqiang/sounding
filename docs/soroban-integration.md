@@ -280,8 +280,12 @@ Multiple apps can consume same on-chain data without trusting Stellar Pathfinder
 
 ## Contract Address
 
-**Testnet**: `<To be populated after deployment>`
-**Mainnet**: `<To be populated after deployment>`
+**Testnet**: `CDZPZIO6JB2WZKDYKNVVJZZA2YZFLODNNX2YF5F3CCOXJZHMAOEFHYQU`
+- **Attestor**: `GCDD4SUD44MMLDBQM2BGIO674XFKD5UFQ4LYMY3RLAPYMC6BDJBUZYG2`
+- **Explorer**: https://stellar.expert/explorer/testnet/contract/CDZPZIO6JB2WZKDYKNVVJZZA2YZFLODNNX2YF5F3CCOXJZHMAOEFHYQU
+- **Lab**: https://lab.stellar.org/r/testnet/contract/CDZPZIO6JB2WZKDYKNVVJZZA2YZFLODNNX2YF5F3CCOXJZHMAOEFHYQU
+
+**Mainnet**: `<To be deployed>`
 
 ## Security
 

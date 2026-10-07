@@ -15,8 +15,8 @@ NC='\033[0m' # No Color
 
 # Check prerequisites
 echo -e "${BLUE}Checking prerequisites...${NC}"
-if ! command -v soroban &> /dev/null; then
-    echo "❌ Soroban CLI not found. Install with:"
+if ! command -v stellar &> /dev/null; then
+    echo "❌ Stellar CLI not found. Install with:"
     echo "   cargo install --locked soroban-cli"
     exit 1
 fi
@@ -40,26 +40,25 @@ echo -e "${GREEN}✓ Contract built${NC}"
 
 # Optimize WASM
 echo -e "${BLUE}Optimizing WASM...${NC}"
-soroban contract optimize \
-  --wasm target/wasm32-unknown-unknown/release/corridor_attestation.wasm
+stellar contract build --package corridor-attestation
 echo -e "${GREEN}✓ WASM optimized${NC}"
 
 # Configure testnet if not already configured
 echo -e "${BLUE}Configuring Stellar testnet...${NC}"
-soroban config network add testnet \
+stellar network add testnet \
   --rpc-url https://soroban-testnet.stellar.org:443 \
   --network-passphrase "Test SDF Network ; September 2015" \
   2>/dev/null || echo "Testnet already configured"
 
 # Generate attestor identity if it doesn't exist
-if ! soroban config identity show attestor &> /dev/null; then
+if ! stellar keys address attestor &> /dev/null; then
     echo -e "${BLUE}Generating attestor identity...${NC}"
-    soroban config identity generate attestor
+    stellar keys generate attestor --network testnet
     echo -e "${GREEN}✓ Attestor identity generated${NC}"
 fi
 
 # Get attestor address
-ATTESTOR_ADDRESS=$(soroban config identity address attestor)
+ATTESTOR_ADDRESS=$(stellar keys address attestor)
 echo -e "${YELLOW}Attestor address: ${ATTESTOR_ADDRESS}${NC}"
 
 # Fund attestor from friendbot
@@ -69,7 +68,7 @@ echo -e "${GREEN}✓ Attestor funded${NC}"
 
 # Deploy contract
 echo -e "${BLUE}Deploying contract to testnet...${NC}"
-CONTRACT_ID=$(soroban contract deploy \
+CONTRACT_ID=$(stellar contract deploy \
   --wasm target/wasm32-unknown-unknown/release/corridor_attestation.wasm \
   --source attestor \
   --network testnet)
@@ -86,7 +85,7 @@ echo ""
 echo "Save this contract ID for integration with Stellar Pathfinder!"
 echo ""
 echo "Test the contract:"
-echo -e "${BLUE}soroban contract invoke \\
+echo -e "${BLUE}stellar contract invoke \\
   --id ${CONTRACT_ID} \\
   --source attestor \\
   --network testnet \\
