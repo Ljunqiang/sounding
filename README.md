@@ -1,8 +1,12 @@
-# Stellar Pathfinder
+# Sounding
+
+![CI](https://github.com/Sounding-Labs/sounding/actions/workflows/ci.yml/badge.svg)
+![License: Apache](https://img.shields.io/badge/license-Apache-blue.svg)
+![Stellar](https://img.shields.io/badge/Stellar-Soroban-7D00FF?logo=stellar&logoColor=white)
 
 **A corridor-integrity monitor for the Stellar network.**
 
-Stellar Pathfinder prices stablecoin → fiat-token corridors across trade sizes, scores
+Sounding prices stablecoin → fiat-token corridors across trade sizes, scores
 every route against independent mid-market rates, and states plainly when
 none of them are worth taking — including when the honest answer is *don't
 send this*.
@@ -12,13 +16,28 @@ issued, no KYC, no keys.
 
 ---
 
-## Try Stellar Pathfinder
+## Table of Contents
+
+- [Try Sounding](#try-sounding)
+- [Why a monitor and not a router](#why-a-monitor-and-not-a-router)
+- [What the measurements found](#what-the-measurements-found)
+- [Stellar Integration](#stellar-integration)
+- [Architecture](#architecture)
+- [Shared contracts](#shared-contracts)
+- [Packages](#packages)
+- [Running it](#running-it)
+- [Roadmap](#roadmap)
+- [Where to start](#where-to-start)
+- [Non-goals](#non-goals)
+- [Verification status](#verification-status)
+
+## Try Sounding
 
 | | |
 |:---|:---|
-| **Live** | **https://stellar-pathfinder.onrender.com/** |
-| **Source** | https://github.com/Stellar-Pathfinder/stellar-pathfinder |
-| **Health** | https://stellar-pathfinder.onrender.com/healthz |
+| **Live** | **https://sounding.onrender.com/** |
+| **Source** | https://github.com/Sounding/sounding |
+| **Health** | https://sounding.onrender.com/healthz |
 
 That is a real deployed instance of the code in this repository — the same
 container image CI builds and verifies. Three things about it are worth knowing
@@ -35,7 +54,7 @@ records are written by `.github/workflows/measure.yml` and committed to `data/`.
 The committed history is a bounded window, not the whole chain: each corridor
 keeps its newest 366 records and rotates the rest (ADR 007) — the dropped,
 older records live on in the repository's git history. The workflow is currently
-unable to push ([#63](https://github.com/Wayfare-labs/wayfare/issues/63)),
+unable to push ([#63](https://github.com/Sounding-Labs/sounding/issues/63)),
 so the served history is older than its six-hour cadence implies. Read
 `stale.age_human` rather than assuming. The mechanism — history embedded at
 build time, so freshness advances by redeploy rather than by scheduler — is
@@ -50,7 +69,7 @@ the boundary between manual retry and built behavior are recorded in
 It runs the current system, and only the current system. Nothing in the v2–v6
 roadmap below is deployed there.
 
-To reproduce it locally, `go run ./cmd/wayfared` and open
+To reproduce it locally, `go run ./cmd/soundingd` and open
 `http://127.0.0.1:8080/` — that measures live against mainnet rather than
 serving history. Deployment details: **[docs/deployment.md](docs/deployment.md)**.
 How the deployed instance serves its embedded history:
@@ -79,7 +98,7 @@ That is also why the reference rate is a required dependency rather than an
 optional enrichment. Without it the engine can rank, but it cannot tell a good
 deal from a disaster.
 
-The full argument, with the measurements behind it: **[docs/why-wayfare.md](docs/why-wayfare.md)**.
+The full argument, with the measurements behind it: **[docs/why-sounding.md](docs/why-sounding.md)**.
 Why Stellar-native and what the code uses: **[docs/why-stellar-native.md](docs/why-stellar-native.md)**.
 
 ---
@@ -121,14 +140,14 @@ that could provide a less charitable benchmark was investigated — no usable
 source was found. See
 [docs/parallel-rate-research.md](docs/parallel-rate-research.md).
 
-The issuer set is case study #1, not the product. Stellar Pathfinder measures any
+The issuer set is case study #1, not the product. Sounding measures any
 stablecoin → fiat-token corridor on the Stellar network.
 
 ---
 
 ## Stellar Integration
 
-Stellar Pathfinder is **Stellar-native** and leverages the network's unique capabilities:
+Sounding is **Stellar-native** and leverages the network's unique capabilities:
 
 **Horizon Pathfinding** — Uses Stellar's `strict-send` pathfinding API, which includes both on-chain order books *and* AMM pools. Traditional order book walks miss AMM liquidity; Horizon's pathfinding delegates to the same engine that executes payments.
 
@@ -228,7 +247,7 @@ deterministic measurements, and answers no on the evidence the repository has:
 Two things about this shape are deliberate.
 
 **The scheduler does not depend on the server.** `monitor` imports nothing from
-`server`, and `wayfared -serve=false` measures with no HTTP at all. A monitor
+`server`, and `soundingd -serve=false` measures with no HTTP at all. A monitor
 that only measures while somebody has a page open would leave holes in its
 history exactly where nobody was looking.
 **[ADR 005](docs/adr/005-why-the-scheduler-does-not-depend-on-the-server.md)**
@@ -256,7 +275,7 @@ refuses to do, who it is for, and the non-custodial position stated once?
 
 Completely new to the ideas, and want the prose version — what a reference
 rate is, why one corridor is priced at twelve sizes, and what a verdict is
-allowed to claim? **[docs/how-wayfare-works.md](docs/how-wayfare-works.md)**
+allowed to claim? **[docs/how-sounding-works.md](docs/how-sounding-works.md)**
 
 Why the monitor is Stellar-native, grounded in what the code uses (assets,
 pathfinding, order books, anchors, SEP-1, SEP-38) without unsupported exclusivity claims:
@@ -376,7 +395,7 @@ Writing a check: **[docs/adding-a-check.md](docs/adding-a-check.md)**
 Writing a metric: **[docs/adding-a-metric.md](docs/adding-a-metric.md)** — which
 opens with the one thing a contributor has to know: a metric written today is
 validated and testable, and reaches no response, because `checks.Runner` has no
-metric path ([#91](https://github.com/Wayfare-labs/wayfare/issues/91)).
+metric path ([#91](https://github.com/Sounding-Labs/sounding/issues/91)).
 
 ### Asset identity — breaking if altered
 
@@ -453,7 +472,7 @@ What verification looks like — including broken-chain output: **[docs/verify-s
 | `snapshot` | Record and replay upstream responses |
 | `server` | HTTP surface and the embedded single-file UI |
 | `cmd/ladder` | Measurement CLI |
-| `cmd/wayfared` | Server and scheduler |
+| `cmd/soundingd` | Server and scheduler |
 | `examples/api-consumer` | Worked example of reading the API correctly |
 
 `anchor.Profile.SEPs()` returns the numbers of the SEPs an anchor advertises
@@ -473,9 +492,9 @@ go run ./cmd/ladder -to GHSC    # any verified corridor
 go run ./cmd/ladder -to GHSC -json | jq
 go run ./cmd/ladder -checks=false    # skip counterparty checks (no findings block)
 
-go run ./cmd/wayfared                       # serve + measure every 6h
-go run ./cmd/wayfared -serve=false          # scheduler only, no HTTP
-go run ./cmd/wayfared -verify-store -data ./data
+go run ./cmd/soundingd                       # serve + measure every 6h
+go run ./cmd/soundingd -serve=false          # scheduler only, no HTTP
+go run ./cmd/soundingd -verify-store -data ./data
 ```
 
 Every `cmd/ladder` run also runs the same counterparty checks the server runs
@@ -521,7 +540,7 @@ Every quote in a response is `"dex"` today — live pathfinding is the only
 thing this project prices — but the field is on the wire from the start so a
 caller never has to guess which rail a figure came from once anchor pricing
 lands (a live SEP-38 round-trip has never been performed — see
-[#180](https://github.com/Wayfare-labs/wayfare/issues/180)).
+[#180](https://github.com/Sounding-Labs/sounding/issues/180)).
 The API is public, keyless and read-only, and answers cross-origin requests
 from any origin (`Access-Control-Allow-Origin: *`), so browser consumers on
 another origin can call it directly. No credentials are ever attached to a
@@ -556,7 +575,7 @@ the default corridor.
 Beyond the contracts above, key reference timestamps and fields on corridor responses include:
 - **`live`**: present on every response. `false` means the reading came from history because a live measurement failed, and `stale` then carries its age. With no stored run, the request errors — nothing is ever synthesised to fill the gap.
 - **`reference_as_of`** and **`reference_secondary_as_of`**: RFC3339 timestamps from the primary and secondary reference rate providers indicating when their respective rate was established by the upstream source. Completely omitted if the provider supplied no timestamp.
-- **`reference_fetched_at`**: RFC3339 timestamp indicating when Wayfare last obtained the rate from the provider.
+- **`reference_fetched_at`**: RFC3339 timestamp indicating when Sounding last obtained the rate from the provider.
 
 **The trend endpoint** answers "is this getting worse?" from the stored runs:
 every run comes back oldest first, each carrying its integrity state, its
@@ -622,7 +641,7 @@ Market-quality metrics — spread, observed versus executable depth, price
 impact, liquidity concentration — are **implemented but not reachable**: `checks.Runner` has no way to run a `Metric`, so none of them
 has ever appeared in a response, been recorded, or been rendered. Effective
 transfer cost (`route.Decompose`) is in the same state — merged, with no caller.
-Wiring that path is [#91](https://github.com/Wayfare-labs/wayfare/issues/91) and
+Wiring that path is [#91](https://github.com/Sounding-Labs/sounding/issues/91) and
 it blocks the rest of v2. Layers 1 and 2.
 
 **v3 — Quantitative execution risk.** **BACKLOG.** Effective transfer cost decomposed into
@@ -648,7 +667,7 @@ readers to trust the publisher instead. That trade needs to be worth something
 first.
 
 **Explicitly not planned.** Settlement primitives — escrow, custody, payment
-execution. Wayfare stopped being a router because measurement proved the
+execution. Sounding stopped being a router because measurement proved the
 corridor structurally broken at every size. It analyses corridors; it does not
 move money through them. If settlement ever earns a place it is a new project
 with its own evidence, not an extension of this one.
@@ -657,7 +676,7 @@ with its own evidence, not an extension of this one.
 
 Issues are labelled by area and by difficulty, and assigned to a roadmap
 milestone so you can see which part of the project your work moves. Start with
-[`good first issue`](https://github.com/Wayfare-labs/wayfare/labels/good%20first%20issue).
+[`good first issue`](https://github.com/Sounding-Labs/sounding/labels/good%20first%20issue).
 
 The full contributor backlog — every gap found in the current tree, with the
 file or response that evidences it — is **[docs/backlog.md](docs/backlog.md)**.
@@ -672,13 +691,13 @@ stumbles people actually hit — rate limits, a sleeping deployment, a
 
 **Milestones:**
 
-- [V1 — Hardening](https://github.com/Wayfare-labs/wayfare/milestone/1) —
+- [V1 — Hardening](https://github.com/Sounding-Labs/sounding/milestone/1) —
   contract fidelity, boundary correctness, coverage, deployment reliability
-- [V2 — Execution economics](https://github.com/Wayfare-labs/wayfare/milestone/2) —
+- [V2 — Execution economics](https://github.com/Sounding-Labs/sounding/milestone/2) —
   making the market-quality measurements reachable, recorded and rendered
-- [V3 — Market structure & history](https://github.com/Wayfare-labs/wayfare/milestone/3) —
+- [V3 — Market structure & history](https://github.com/Sounding-Labs/sounding/milestone/3) —
   statistics over recorded history, once records carry measurements
-- [V4+ — Future (not active)](https://github.com/Wayfare-labs/wayfare/milestone/4) —
+- [V4+ — Future (not active)](https://github.com/Sounding-Labs/sounding/milestone/4) —
   research spikes only; nothing here is an implementation task
 
 **Labelling convention:**
@@ -721,7 +740,7 @@ constraints, not style preferences. Submissions follow the templates in
 **Questions?** The [contributor FAQ](docs/contributor-faq.md) covers what the
 project does and does not do, how to get set up, what is not built yet, and how
 to check a claim against the code. Ask the rest in
-[Discussions → Q&A](https://github.com/Wayfare-labs/wayfare/discussions/categories/q-a).
+[Discussions → Q&A](https://github.com/Sounding-Labs/sounding/discussions/categories/q-a).
 What contributors have actually asked here, with each answer checked against the
 code: **[docs/discussion-questions.md](docs/discussion-questions.md)**.
 
@@ -754,8 +773,8 @@ The full register — what this project refuses to build, and why, plus the
 | SEP-38 fee identity | Verified against SEP-0038 spec text, pinned in golden files |
 | USDC issuer is Circle's | **Not yet verified** against circle.com stellar.toml |
 | Live SEP-38 round-trip | **Verified** — recorded fixture from testanchor.stellar.org in `sep38/testdata/live/` |
-| Public deployment | Running at [wayfare-cdb9.onrender.com](https://wayfare-cdb9.onrender.com/); `/healthz` verified 200 on 2026-08-24 |
-| Continuous measurement | **Not currently running** — the measure workflow cannot push ([#63](https://github.com/Wayfare-labs/wayfare/issues/63)), so the served history is frozen at its last successful sweep |
+| Public deployment | Running at [sounding-cdb9.onrender.com](https://sounding-cdb9.onrender.com/); `/healthz` verified 200 on 2026-08-24 |
+| Continuous measurement | **Not currently running** — the measure workflow cannot push ([#63](https://github.com/Sounding-Labs/sounding/issues/63)), so the served history is frozen at its last successful sweep |
 
 Unverified claims are marked in the code at the point they are used.
 
