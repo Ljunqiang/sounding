@@ -224,6 +224,7 @@ The usual causes:
   invariants and the pre-commit verify guard (§4)
 - [embedded-history.md](embedded-history.md) — how the deployed instance
   serves history and why `stale` is a normal state (§2)
-- [monitor.md](monitor.md) — the six-hour cadence and provider budgets (§1)
+- [deployment.md](deployment.md) — why a run happens every six hours, and what
+  a run is allowed to spend (§2, §6)
 - [non-goals.md](non-goals.md) — why "not determined" never becomes a false
   (§3)

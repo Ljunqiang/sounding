@@ -204,8 +204,35 @@ jobs:
           scan-type: image
           image-ref: wayfare:ci
           scanners: vuln
-          vuln-type: os
+          vuln-type: os,library
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           format: table
           exit-code: "1"
+
+  # docs/ describes itself as the contract this repository is held to, and
+  # until now nothing read it: four relative links pointed at files that do
+  # not exist (one of them at a document that was never written) and every
+  # pull request stayed green. This walks every *.md, resolves each relative
+  # link against the directory of the file carrying it, and names the ones
+  # that do not resolve.
+  #
+  # The check runs offline and needs no toolchain, so it uses the python3
+  # already on the runner rather than a pinned action or a package install:
+  # a link that resolves on disk resolves the same way on every machine, and
+  # there is nothing to drift.
+  #
+  # http(s) targets and bare #anchors are skipped rather than resolved. A
+  # URL would need the network — which this repository's jobs deliberately
+  # do without — and an anchor needs the headings of the same file, so
+  # neither can be judged here. Only what the filesystem can answer is
+  # reported.
+  docs:
+    name: relative markdown links
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: check relative markdown links
+        run: python3 scripts/check-md-links.py
