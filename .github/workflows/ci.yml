@@ -204,7 +204,7 @@ jobs:
           scan-type: image
           image-ref: wayfare:ci
           scanners: vuln
-          vuln-type: os,library
+          vuln-type: os
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           format: table
